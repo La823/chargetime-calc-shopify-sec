@@ -1,0 +1,1225 @@
+{% schema %}
+{
+  "name": "chargersuggest",
+  "settings": [],
+  "presets": [
+    {
+      "name": "chargersuggest",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
+
+
+ <style>
+  /* Products Container */
+.products-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-evenly;
+  width: 100%;
+}
+
+.product-card {
+  width: 200px;
+  background-color: white;
+  color: black;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  transition: transform 0.4s ease-in-out;
+}
+
+.product-card a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.4s ease-in-out;
+}
+
+.product-card:hover img {
+  transform: scale(1.03);
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+  box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Selection Groups */
+.carcomp {
+  display: flex; 
+  justify-content: space-evenly;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.selection-group {
+  margin: 0;
+  padding:0;
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
+  width: 48%;
+  flex-wrap: wrap;
+}
+
+.selection-group label {
+  font-size: 10px;
+  color: #000;
+  font-weight: lighter;
+  width: 80%;
+}
+
+.selection-group select {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: lighter;
+  border-radius: 5px;
+  border: none;
+  background-color: #fff;
+  color: #000;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.selection-group select:hover {
+  background-color: #f9f9f9;
+  transform: scale(1.05);
+}
+
+.selection-group select:focus {
+  background-color: #f1f1f1;
+  outline: none;
+  transform: scale(1.05);
+}
+
+.selection-group select option {
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 100;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.selection-group select option:hover {
+  background-color: #f1f1f1;
+  color: #000;
+}
+
+.selection-group select option:checked {
+  background-color: #000000;
+  color: white;
+}
+
+/* Button Container */
+.button-container {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.button-container button {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(50% - 10px);
+  height: 90px;
+  padding: 0.5em 1em;
+  border-radius: 7px;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-family: "Roboto", sans-serif;
+  font-size: 1em;
+  font-weight: 250;
+  color: #000000;
+  text-shadow: 0 0.04em 0.04em rgba(255, 255, 255, 0.253);
+  cursor: pointer;
+  background-color: white;
+}
+
+.button-container button img {
+  width: 50px !important;
+  height: 50px !important;
+  object-fit: contain;
+  max-width: 40px !important;
+  max-height: 40px !important;
+}
+
+.button-container button:hover,
+.button-container button.active {
+  background-color: #000000;
+  color: white;
+  border-color: #000000;
+  text-shadow: none;
+}
+
+.button-container button:hover img, 
+.button-container button:active img,
+.button-container button.active img {
+  filter: invert(1) !important;
+}
+
+.power-container {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: nowrap; /* Changed to prevent wrapping */
+  gap: 8px;
+  width: 100%;
+  margin: 10px 0;
+  padding: 0;
+}
+
+.power-container button {
+  padding: 0.3em 0.5em;
+  border: none;
+  border-radius: 6px;
+  width: calc(25% - 8px); /* Changed to 25% for 4 buttons in one row */
+  height: 80px;
+  text-decoration: none;
+  font-family: "Roboto", sans-serif;
+  font-weight: 200;
+  font-size: 0.9em;
+  color: #000000;
+  text-shadow: 0 0.04em 0.04em rgba(255, 255, 255, 0.253);
+  text-align: center;
+  transition: all 0.2s;
+  cursor: pointer;
+  background-color: white;
+}
+
+.power-container button:hover,
+.power-container button.active {
+  background-color: #000000;
+  color: white;
+  border-color: #000000;
+  text-shadow: none;
+}
+
+.power-container button.disabled,
+.power-container button:disabled {
+  background-color: #d3d3d3;
+  color: #a9a9a9;
+  border-color: #a9a9a9;
+  cursor: not-allowed;
+  text-shadow: none;
+}
+
+/* Charging Time Display */
+#chargingTimeDisplay {
+  width: 40%;
+  background-color: #17C691;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2rem;
+  text-align: center;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: space-between;
+  height: 230px;
+  flex: 1;
+  padding: 0px;
+  padding-top:0px;
+  /* margin: 20px; */
+  margin-right: 80px;
+  margin-top: 75px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.disclaim{
+  font-size:8px;
+  padding-right:3px;
+  text-align: right;
+}
+
+   
+.left {
+  width: 60%;
+  padding-right:10%;
+  padding-left:10%;
+}
+
+/* Section Styling */
+.mysection {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #EBEEF6;
+}
+
+
+/* Scroll Button Fix */
+.scroll-btn {
+  background-color: rgba(255, 255, 255, 0.3);
+  border: none;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  cursor: pointer;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.3);
+  position: absolute;
+  z-index: 10;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(2px);
+  padding: 0; /* Added to prevent padding issues */
+  margin: 0; /* Added to prevent margin issues */
+  aspect-ratio: 1/1; /* Added to ensure perfect circle */
+}
+
+.scroll-btn.left {
+  left: 10px;
+  width: 40px !important; /* Force width */
+  height: 40px !important; /* Force height */
+  min-width: 40px !important;
+  min-height: 40px !important;
+  flex: 0 0 40px !important; /* Prevent flex growth/shrink */
+}
+
+/* Keep other styles the same */
+.scroll-btn:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.scroll-btn.right {
+  right: 10px;
+}
+/* Container styling */
+.see {
+  position: relative;
+  width: 100%;
+  padding: 0 50px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#charger-list {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 20px 0;
+  gap: 20px;
+}
+
+#charger-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* Slider Styling */
+.slider-container {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+
+   .separator {
+  width: 60%;
+  height: 2px;
+  background-color: black;
+  display: block !important; /* Ensures visibility */
+  z-index: 999; /* Brings it to the front */
+   margin:-40px auto 25px;
+}
+.separator {
+  border: 1px solid white;
+  background-color:white;
+}
+
+
+@media screen and (max-width: 1024px) {
+  .divisionsec {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .left {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .carcomp {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .selection-group {
+    width: 90%;
+    margin: 5px 0;
+  }
+
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 90%;
+  }
+
+  .button-container button {
+    width: calc(50%-10px);
+    height: 45px;
+    font-size: 0.9em;
+  }
+
+  /* Keep power buttons in a single row */
+  .power-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 90%;
+  }
+
+  .power-container button {
+    width: calc(25% - 10px);
+    height: 45px;
+    font-size: 0.9em;
+  }
+
+  .slider-container {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #chargingTimeDisplay {
+    width: 90%;
+    margin: 20px auto;
+    height: 200px;
+    text-align: center;
+  }
+
+  #chargingTime {
+    font-size: 80px !important;
+  }
+}
+
+   .separator {
+  width: 60%;
+  height: 2px;
+  background-color: black;
+  display: block !important; /* Ensures visibility */
+  z-index: 999; /* Brings it to the front */
+   margin:-40px auto 25px;
+}
+.separator {
+  border: 1px solid white;
+  background-color:white;
+}
+
+@media screen and (max-width: 768px) {
+
+ .mysection{
+    padding:0;
+    margin:0;
+  }
+
+  .left{
+     padding:0;
+    margin:0;
+  }
+
+  .carcomp{
+     padding:0;
+    margin:0;
+  }
+
+  .divisionsec{
+     padding:0;
+    margin:0;
+  }
+
+ 
+  
+  .selection-group {
+    width: 100%;
+    padding-right:0px;
+  }
+
+  .separator {
+  width: 60%;
+  height: 2px;
+  background-color: black;
+  display: block !important; /* Ensures visibility */
+  z-index: 999; /* Brings it to the front */
+   margin:-40px auto 25px;
+}
+.separator {
+  border: 1px solid white;
+  background-color:white;
+}
+
+ @media screen and (max-width: 768px) {
+  .button-container {
+    display: flex;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    justify-content: space-between; /* Spread buttons */
+    width: 100%;
+    gap: 10px; /* Add slight spacing */
+  }
+
+  .button-container button {
+    flex: 1; /* Make buttons take equal space */
+    max-width: 50%; /* Adjust size to fit in a row */
+    font-size: 0.5em;
+    height: 40px;
+    border-radius: 5px;
+  }
+}
+
+  /* Ensure power buttons remain in a single row */
+  .power-container {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .power-container button {
+    width: 24%;
+    font-size: 0.6em;
+    height: 40px;
+    border-radius:5px;
+  }
+
+  .slider-container {
+    width: 100%;
+  }
+
+  #chargingTimeDisplay {
+    height: 180px;
+    padding-bottom:0px;
+  }
+
+  #chargingTime {
+    font-size: 60px !important;
+  }
+}
+.separator {
+  width: 60%;
+  height: 2px;
+  background-color: black;
+  display: block !important; /* Ensures visibility */
+  z-index: 999; /* Brings it to the front */
+   margin:-30px auto 25px;
+}
+.separator {
+  border: 1px solid white;
+  background-color:white;
+}
+
+@media screen and (max-width: 480px) {
+
+  .mysection{
+    padding:0;
+    margin:0;
+  }
+
+  .left{
+     padding:0;
+    margin:0;
+  }
+
+  .carcomp{
+     padding:0;
+    margin:0;
+  }
+
+  .divisionsec{
+     padding:0;
+    margin:0;
+  }
+
+  
+  
+  .selection-group {
+    width: 100%;
+    padding-right:0px;
+    
+  }
+.mysection {
+    padding: 0;
+    margin: 0;
+  }
+
+  .button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 0 0px; /* Reduce padding further for mobile */
+  }
+
+  .button-container button {
+    width: (50% ); /* Slightly adjust width for smaller screens */
+    height: 40px; /* Reduce height slightly */
+    font-size: 0.58em; /* Reduce font size slightly */
+    
+  }
+  /* Keep power buttons in a row with smaller size */
+  .power-container {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .power-container button {
+    width: 23%;
+    font-size: 0.7em;
+    height: 35px;
+  }
+
+  .slider-container {
+    width: 100%;
+  }
+
+  #chargingTime {
+    font-size: 50px !important;
+  }
+}
+
+
+
+    #chargingTimeDisplay {
+    padding-bottom:0px;
+  }
+.separator {
+  width: 60%;
+  height: 2px;
+  background-color: black;
+  display: block !important; /* Ensures visibility */
+  z-index: 999; /* Brings it to the front */
+   margin:-10px auto 25px;
+}
+.separator {
+  border: 1px solid white;
+  background-color:white;
+}
+
+
+ </style>
+
+  
+
+
+
+<div class="mysection">
+
+  <div class="divisionsec" style="display:flex;">
+
+
+
+    
+    <div class="left" >
+  <div class="calculator-container">
+    <h3 style="text-align: center; font-weight:300; ">EV Charger Finder</h3>
+
+    <div class="carcomp" style="display: flex; justify-content: space-evenly">
+      <div class="selection-group">
+        <label for="company"></label>
+        <select id="company" onchange="updateCarDropdown()">
+          <option value="">Select Car Manufacturer</option>
+        </select>
+      </div>
+
+  
+
+
+      <div class="selection-group">
+        <label for="car"></label>
+        <select id="car" onchange="setBatterySize()">
+          <option value="">Select Car Model</option>
+        </select>
+      </div>
+    </div>
+
+   
+    <div class="button-container">
+      <button onclick="filterChargers('Wall-Mount')">Wall-Mount  <img src="{{ 'wallmount-logoicon.svg' | asset_url }}" alt="Cart Icon"> </button>
+      <button onclick="filterChargers('Portable')">Portable   <img src="{{ 'portableicon.svg' | asset_url }}" alt="Cart Icon"></button>
+    </div>
+
+    <div class="power-container">
+      <button id="power-3.5kW" onclick="filterPower('3.5 kW')">3.6 kW</button>
+      <button id="power-7.2kW" onclick="filterPower('7.2 kW')">7.2 kW</button>
+      <button id="power-11kW" onclick="filterPower('11 kW')">11 kW</button>
+      <button id="power-22kW" onclick="filterPower('22 kW')">22 kW</button>
+    </div>
+
+  </div>
+
+  
+  
+      <div class="slider-container">
+    <label for="range-slider" class="slider-label"></label>
+    <input type="range" id="range-slider" class="range-slider" min="0" max="100" value="0">
+    <div style="display:inline;"><span id="slider-value" class="slider-value" style="font-weight:75;font-size-15px;padding-top:5px;">0</span><span  style="font-weight:75;font-size-15px;padding-left:15px;">%</span></div>
+  </div>
+          <!-- <div id="difference">Difference: 100</div> -->
+
+   
+    </div>
+
+
+    
+  <div id="chargingTimeDisplay">
+    <div class="disclaim" > *Approx time to charge</div>
+    <div style="display:inline; position: relative; top: 0; width: 100%;"> <span id="chargingTime" style="font-size:100px;font-weight:600;"> 00:0 </span> <div style="font-size:30px;font-weight:200;display:inline;margin:0px;">Hr</div></div>
+      <hr class="separator">
+    <div id="batterySizeDisplay" style="position: relative; bottom: 20px; width: 100%; font-weight:100;font-size:20px">
+    <div> <span style="font-weight:100;font-size:20px">Battery Size: </span><span id="batterySize"style="font-weight:100;font-size:20px">-</span> kWh</div>
+    </div>
+
+   </div>
+    
+  </div>
+
+
+
+        
+
+
+  <!-- Ensure proper closing of divs and structure -->
+  <div class="see" style="display:flex">
+   <button class="scroll-btn left" onclick="scrollLeftFixed()">←</button>
+    <ul id="charger-list" style="display:flex; justify-content: space-evenly; list-style-type: none;">
+        
+      <!-- List of chargers will go here -->
+    
+
+    <div class="products-container" id="dynamic-products" style="display:flex;">
+      <!-- Product cards will go here -->
+    </div></ul>
+    <button class="scroll-btn right" onclick="scrollRightFixed()">→</button>
+  </div>
+
+
+  
+</div>
+
+
+
+
+
+
+
+
+<script>
+
+let selectedPower = null;
+let currentBatteryCapacity = null;
+  
+  let carData = [];
+let chargerData = [];
+
+  // Fetch car data
+  
+fetch('{{ "carDatafinal.json" | asset_url }}')
+.then(response => response.json())
+  .then(data => {
+    carData = data;
+    populateCompanyDropdown();
+  })
+  .catch(error => console.error('Error fetching car data:', error));
+
+  fetch('{{ "chargerDatafinal.json" | asset_url }}')
+  .then(response => response.json())
+  .then(data => {
+    chargerData = data;
+    populateCompanyDropdown();
+  })
+  .catch(error => console.error('Error fetching charger data:', error));
+
+
+
+function populateCompanyDropdown() {
+    if (!carData || carData.length === 0) return; //  Prevents crash
+
+    const companyDropdown = document.getElementById('company');
+    const companies = [...new Set(carData.map(car => car.Company?.trim()))].sort();
+
+    companies.forEach(company => {
+        const option = document.createElement('option');
+        option.value = company;
+        option.textContent = company;
+        companyDropdown.appendChild(option);
+    });
+}
+
+  function updateCarDropdown() {
+  const selectedCompany = document.getElementById('company').value;
+  const carDropdown = document.getElementById('car');
+  
+  carDropdown.innerHTML = '<option value="">--Select a Car--</option>';
+  
+  const filteredCars = carData
+    .filter(car => car.Company.trim() === selectedCompany)
+    .sort((a, b) => a['Car model'].localeCompare(b['Car model']));
+
+  filteredCars.forEach(car => {
+    const option = document.createElement('option');
+    option.value = car['Car model'];
+    option.textContent = car['Car model'];
+    carDropdown.appendChild(option);
+  });
+      document.getElementById('batterySize').textContent = '--';
+
+  }
+
+
+let selectedCar = null;  // Ensure the selectedCar is initialized
+
+function setBatterySize() {
+    const selectedCarModel = document.getElementById('car').value;
+    selectedCar = carData.find(car => car['Car model'] === selectedCarModel);
+    
+    if (selectedCar) {
+        const batterySize = selectedCar['Battery size'];
+        document.getElementById('batterySize').textContent = batterySize;
+        currentBatteryCapacity = parseFloat(batterySize);
+        // If power is already selected, calculate charging time
+        if (selectedPower) {
+            calculateAndDisplayChargingTime();
+        }
+    } else {
+        document.getElementById('batterySize').textContent = '--';
+        currentBatteryCapacity = null;
+    }
+
+    // Only calculate charging time if both are selected
+    if (currentBatteryCapacity && selectedPower) {
+        calculateAndDisplayChargingTime();
+    }
+}
+
+
+  let filteredChargers = []; // Store chargers filtered by Form
+
+
+
+// Step 1: Filter by Form
+function filterChargers(formType) {
+    filteredChargers = chargerData.filter(charger => charger.Form === formType); // Store filtered chargers
+
+    updateChargerList(filteredChargers); // Display chargers as product cards
+    updatePowerButtons(filteredChargers); // Enable/disable power buttons
+
+    // Reset Power buttons when Form is selected
+    document.querySelectorAll(".power-container button").forEach(btn => {
+        btn.classList.remove("active"); // Remove active from all power buttons
+    });
+
+    // Set active class for the selected form type button
+    document.querySelectorAll(".button-container button").forEach(btn => {
+        btn.classList.remove("active"); // Remove active from all form buttons
+    });
+
+    // Find the button with the text matching the selected form type and add the active class
+    const formButton = Array.from(document.querySelectorAll('.button-container button')).find(button => button.textContent.trim() === formType);
+    if (formButton) {
+        formButton.classList.add("active"); // Add active class to the selected button
+    }
+}
+
+// Step 2: Filter by Power 
+function filterPower(power) {
+    selectedPower = parseFloat(power.replace(/[^\d.]/g, '')); // Extract number from "3.5 kW"
+    
+    if (filteredChargers.length === 0) {
+        document.getElementById("charger-list").innerHTML = "<li>Please select Portable or Wall-Mount first.</li>";
+        return;
+    }
+
+    const finalFilteredChargers = filteredChargers.filter(charger => charger["Power capacity"] === power);
+    updateChargerList(finalFilteredChargers);
+
+    // Set active class for the selected power button
+    document.querySelectorAll(".power-container button").forEach(btn => {
+        btn.classList.remove("active"); // Remove active from all power buttons
+    });
+    
+    // Find the button with the text matching the selected power and add the active class
+    const powerButton = Array.from(document.querySelectorAll('.power-container button')).find(button => button.textContent.trim() === power);
+    if (powerButton) {
+        powerButton.classList.add("active"); // Add active class to the selected button
+    }
+
+    // Calculate charging time if car is selected
+    if (currentBatteryCapacity) {
+        calculateAndDisplayChargingTime();
+    }
+}
+
+  
+
+  // Step 3: Update Charger List Display
+// async function updateChargerList(list) {
+//     const chargerList = document.getElementById("charger-list");
+//     chargerList.innerHTML = ""; // Clear previous list
+
+//     if (list.length === 0) {
+//         chargerList.innerHTML = "<li>No chargers found</li>";
+//         return;
+//     }
+
+//     for (const charger of list) {
+//         const productCardHTML = await createProductCard(charger); // Ensure it's resolved before appending
+//         chargerList.innerHTML += productCardHTML;
+//     }
+// }
+
+async function updateChargerList(list) {
+    const chargerList = document.getElementById("charger-list");
+    chargerList.innerHTML = ""; // Clear previous content
+
+    if (list.length === 0) {
+        chargerList.innerHTML = "<li>No chargers found</li>";
+        return;
+    }
+
+    // Gather all product card HTMLs in parallel
+    const productCards = await Promise.all(list.map(charger => createProductCard(charger)));
+
+    // Insert all product cards at once to avoid sequential rendering issues
+    chargerList.innerHTML = productCards.map(card => `<li>${card}</li>`).join('');
+}
+
+// Step 4: Enable/Disable Power Buttons Based on Availability
+function updatePowerButtons(list) {
+    const powerLevels = ["3.5 kW", "7.2 kW", "11 kW","22 kW"];
+
+    powerLevels.forEach(power => {
+        const button = document.getElementById(`power-${power.replace(/\s/g, '')}`);
+        if (button) {
+            const isAvailable = list.some(charger => charger["Power capacity"] === power);
+            button.disabled = !isAvailable; // Disable if not available
+        }
+    });
+}
+
+
+  async function fetchProductPrice(handle) {
+  try {
+    // Fetch product data using the handle from Shopify's API
+    const response = await fetch(`/products/${handle}.js`);
+    const productData = await response.json();
+    
+    // Extract the price from the first variant (in cents, so divide by 100)
+    const price = productData.variants[0].price / 100; // Convert from cents to dollars
+    return price;
+  } catch (error) {
+    console.error("Error fetching product price:", error);
+    return null; // Return null in case of an error
+  }
+}
+async function fetchProductDetails(handle) {
+  try {
+    // Fetch product data using the handle from Shopify's API
+    const response = await fetch(`/products/${handle}.js`);
+    const productData = await response.json();
+    
+    // Extract product title and price (convert from cents to currency format)
+    const title = productData.title;
+    const price = productData.variants[0].price / 100; // Convert from cents to dollars
+
+    return { title, price };
+  } catch (error) {
+    console.error("Error fetching product details:", error);
+    return { title: "Unknown Product", price: null }; // Return fallback values on error
+  }
+}
+
+  
+async function fetchProductDetails(handle) {
+  try {
+    const response = await fetch(`/products/${handle}.js`);
+    const productData = await response.json();
+    const title = productData.title; // Product title
+    const price = productData.variants[0].price / 100; // Price in INR
+    return { title, price }; // Return both title and price
+  } catch (error) {
+    console.error("Error fetching product details:", error);
+    return { title: 'Product Unavailable', price: null }; // Default values in case of an error
+  }
+}
+
+async function createProductCard(charger) {
+  const handle = charger.Handle.toLowerCase().replace(/\s+/g, '-');  // Use the handle from your JSON
+  const { title, price } = await fetchProductDetails(handle); // Fetch product title and price using the handle
+  
+  return `
+    <div class="product-container">
+      <div class="product-card">
+        <a href="/products/${handle}">
+          <img src="${charger['Image']}" alt="Product Image">
+          <h6 style="font-size: 14px; font-weight: 400; margin: 0;text-align: center;">${title}</h6> <!-- Display fetched title -->
+          <p style="font-size: 10px; font-weight: 200; color: #555; margin: 5px 0;text-align: center;">Power: ${charger['Power capacity']}</p>
+          <p style="font-size: 14px; font-weight: 300;text-align: center;">Rs. ${price !== null ? price : 'N/A'}</p> <!-- Display fetched price -->
+        </a>
+      </div>
+    </div>`;
+}
+
+  function getMaxChargingSpeedForCar(selectedCar) {
+    // Find the selected car object from the carData
+    const car = carData.find(car => car['Car model'] === selectedCar);
+    
+    // If the car is found, extract the max charging speed
+    if (car) {
+        const maxChargingSpeed = car['Maximum supported AC charging speed (kW)']; // Replace with the actual property for max charging speed in the JSON
+        console.log("Max Charging Speed for " + selectedCar + ": " + maxChargingSpeed + " kW");
+
+        // Return the max charging speed as a number
+        return parseFloat(maxChargingSpeed);
+    } else {
+        console.log("Car not found");
+        return null; // Return null if car is not found
+    }
+}
+
+
+
+function calculateAndDisplayChargingTime() {
+    // Get current slider value (starting battery percentage)
+    const startingPercentage = parseInt(document.getElementById("range-slider").value);
+    
+    if (!currentBatteryCapacity || !selectedPower) {
+        console.log("Missing required values:", {
+            currentBatteryCapacity,
+            selectedPower,
+            startingPercentage
+        });
+        return;
+    }
+
+    // Calculate percentage that needs to be charged (from starting % to 100%)
+    const percentageToCharge = startingPercentage;
+    
+    // Calculate energy needed in kWh
+    const energyNeeded = (percentageToCharge / 100) * currentBatteryCapacity;
+    
+    // Get the max charging speed for the selected car
+    const maxChargingSpeed = getMaxChargingSpeedForCar(document.getElementById('car').value);
+    
+    let effectivePower = selectedPower;
+    if (maxChargingSpeed && !isNaN(maxChargingSpeed)) {
+        // Ensure selectedPower does not exceed maxChargingSpeed
+        effectivePower = Math.min(selectedPower, maxChargingSpeed);
+    }
+
+    // Calculate charging time in hours
+    const chargingTime = energyNeeded / effectivePower;
+
+    // Convert to hours and minutes
+    const hours = Math.floor(chargingTime);
+    const minutes = Math.round((chargingTime - hours) * 60);
+
+    // Format the time display with leading zeros for minutes
+    const timeDisplay = document.getElementById('chargingTime');
+    timeDisplay.textContent = `${hours}:${minutes.toString().padStart(2, '0')}`;
+}
+// Update the slider event listener
+document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById("range-slider");
+    const sliderValue = document.getElementById("slider-value");
+
+    slider.addEventListener("input", function() {
+        const value = slider.value;
+        sliderValue.textContent = value;
+        
+        // Update the background fill
+        slider.style.setProperty('--value', `${(value / slider.max) * 100}%`);
+
+        // Calculate charging time if all dependencies are available
+        if (currentBatteryCapacity && selectedPower) {
+            calculateAndDisplayChargingTime();
+        }
+    });
+});
+  // JavaScript to display the current value of the slider and adjust the background
+const slider = document.getElementById("range-slider");
+const sliderValue = document.getElementById("slider-value");
+
+slider.addEventListener("input", function() {
+  sliderValue.textContent = slider.value;
+  // Update the background gradient based on the slider value
+  slider.style.setProperty('--value', `${(slider.value / slider.max) * 100}%`);
+});
+
+
+
+
+
+  function scrollLeftFixed() {
+    const list = document.getElementById("charger-list");
+    if (list) {
+        list.scrollLeft -= 300; // Scroll by fixed amount
+    }
+}
+
+function scrollRightFixed() {
+    const list = document.getElementById("charger-list");
+    if (list) {
+        list.scrollLeft += 300; // Scroll by fixed amount
+    }
+}
+
+// Update your existing scroll functions to use these new ones
+function scrollLeft() {
+    scrollLeftFixed();
+}
+
+function scrollRight() {
+    scrollRightFixed();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById("range-slider");
+    const sliderValue = document.getElementById("slider-value");
+
+    // Function to update the slider background and value
+    function updateSlider() {
+        const value = slider.value;
+        sliderValue.textContent = value;
+
+        // Ensure the slider track fills correctly
+        slider.style.setProperty('--value', `${(value / slider.max) * 100}%`);
+
+        // Calculate charging time if dependencies exist
+        if (typeof currentBatteryCapacity !== "undefined" && typeof selectedPower !== "undefined") {
+            calculateAndDisplayChargingTime();
+        }
+    }
+
+    // Initialize slider on page load
+    updateSlider();
+
+    // Add event listener to update on input
+    slider.addEventListener("input", updateSlider);
+});
+
+
+
+
+
+  
+ </script>
+
+<style>
+/* Container for the range slider */
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  margin: 10px auto;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+/* Label for the slider */
+.slider-label {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Styling for the range slider */
+.range-slider {
+  -webkit-appearance: none;
+  width: 90%;
+  height: 5px;
+  background: linear-gradient(to right, #000 0%, #000 var(--value), #9d9fa0 0%, #9d9fa0 100%);
+  border-radius: 5px;
+  outline: none;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin: 0 auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* Hover and focus effect */
+.range-slider:hover, .range-slider:focus {
+  background: linear-gradient(to right, #000 0%, #000 var(--value), #959595 0%, #959595 100%);
+  transform: scale(1.05);
+}
+
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  /* border: 2px solid #aaaaaa; */
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.range-slider::-webkit-slider-thumb:hover {
+  background: #000000;
+  transform: scale(1.2);
+}
+
+.slider-value {
+  font-size: 18px;
+  color: #333;
+  margin-top: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin:-10px;
+}
+
+.range-slider:active ~ .slider-value {
+  color: #000;
+}
+
+
+  .chargingTimeDisplay {
+  display: block !important;
+}
+
+
+  
+</style>
